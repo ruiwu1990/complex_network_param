@@ -44,7 +44,7 @@ for (line<-Source.fromFile(filename).getLines()){
 }
 
 // parepare 
-// var temp_graph_vertex =new  Array[(Int,String)](temp_vertex.length/2)
+// var temp_graph_vertex = new Array[(Long,String)](temp_vertex.length/2)
 var temp_graph_vertex = new Array[(Long,String)](temp_vertex.length/2)
 var count = 0
 for (count<-0 to (temp_vertex.length/2-1)){
@@ -61,19 +61,26 @@ for (count<-0 to (temp_edge.length/3-1)){
 
 val graph_edge: RDD[Edge[Int]] = sc.parallelize(temp_graph_edge)
 
-val default_node = ("missing_node","missing")
-// the function if for get max degree
-// return (vetex ID, result)
-graph.inDegrees.max
-graph.outDegrees.max
-graph.degrees.max
 
+val graph = Graph(graph_vertex,graph_edge)
+// the function, get max degree
+// http://spark.apache.org/docs/latest/graphx-programming-guide.html
+def max(a: (VertexId, Int), b: (VertexId, Int)): (VertexId, Int) = {
+  if (a._2 > b._2) a else b
+}
+val max_in_degree: (VertexId, Int)  = graph.inDegrees.reduce(max)
+val max_out_degree: (VertexId, Int) = graph.outDegrees.reduce(max)
+val max_degrees: (VertexId, Int)   = graph.degrees.reduce(max)
 
-println(temp_vertex(0).mkString(" "))
-println(temp_vertex(1).mkString(" "))
+// get the degree info
+val in_degrees: VertexRDD[Int] = graph.inDegrees
+val out_degrees: VertexRDD[Int] = graph.outDegrees
+val degrees: VertexRDD[Int] = graph.degrees
 
-println(temp_edge(0).mkString(" "))
-println(temp_edge(1).mkString(" "))
+// get degree distribution
+var count = 0
+var temp_degree_pair = degrees.map(line => (line._2,1))
+val result_degree = temp_degree_pair.groupByKey()
+val final_result_degree = result_degree.map(line => (line._1,line._2.sum))
 
 System.exit(0)
-
