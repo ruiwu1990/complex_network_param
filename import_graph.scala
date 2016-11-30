@@ -97,17 +97,18 @@ val shortestPath = result               // result is a graph
 */
 // val shortestPath = result.vertices.filter({case(vId, _) => vId == 160}).first._2.get(1)
 
-
+import scala.collection.mutable.ArrayBuffer
 // this code find all the neighbours of the vertex
 // return the merge
-def find_neighbour(new_arr:ArrayBuffer[VertexId]) : ArrayBuffer[VertexId] = {
-	var final_result = ArrayBuffer[VertexId]()
+def find_neighbour(new_arr:ArrayBuffer[Long]) : ArrayBuffer[Long] = {
+	var final_result = ArrayBuffer[Long]()
 	for(item <- new_arr){
 		// extract neighbours based on srcId
 		val temp = graph.edges.filter(e => e.srcId == item)
-		val temp_arr = temp.map(e=>e.dstId)
-		// Step1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!this line does not work
-		final_result = final_result ++ temp_arr
+		val temp_RDD = temp.map(e=>e.dstId)
+		val temp_RDD_long = temp_RDD.map(e=>e.toLong)
+		// collect convert RDD into array
+		final_result = final_result ++ temp_RDD_long.collect()
 	}
 	return final_result
 }
@@ -118,9 +119,9 @@ def find_neighbour(new_arr:ArrayBuffer[VertexId]) : ArrayBuffer[VertexId] = {
 import scala.collection.mutable.ArrayBuffer
 
 def vertex_hop_distribution(vertex_id:Long) = {
-	var pre_arr = ArrayBuffer[VertexId]()
-	var cur_arr = ArrayBuffer[VertexId]()
-	var new_arr = ArrayBuffer[VertexId](vertex_id)
+	var pre_arr = ArrayBuffer[Long]()
+	var cur_arr = ArrayBuffer[Long]()
+	var new_arr = ArrayBuffer[Long](vertex_id)
 	var loop_count = 0
 
 	while(new_arr.length != 0){
@@ -130,7 +131,7 @@ def vertex_hop_distribution(vertex_id:Long) = {
 		pre_arr = cur_arr
 		cur_arr = new_arr
 		new_arr = find_neighbour(new_arr)
-		// Step2 see if the results right with sample graph a, b, c, d
+		// Step2 put results into a file
 	}
 
 }
