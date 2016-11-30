@@ -83,4 +83,56 @@ var temp_degree_pair = degrees.map(line => (line._2,1))
 val result_degree = temp_degree_pair.groupByKey()
 val final_result_degree = result_degree.map(line => (line._1,line._2.sum))
 
+/*
+import org.apache.spark.graphx._
+import org.apache.spark.graphx.lib.ShortestPaths
+
+val result = ShortestPaths.run(graph, Seq(160))
+val shortestPath = result               // result is a graph
+  .vertices                             // we get the vertices RDD
+  .filter({case(vId, _) => vId == 1})  // we filter to get only the shortest path from v1
+  .first                                // there's only one value
+  ._2                                   // the result is a tuple (v1, Map)
+  .get(160)  
+*/
+// val shortestPath = result.vertices.filter({case(vId, _) => vId == 160}).first._2.get(1)
+
+
+// this code find all the neighbours of the vertex
+// return the merge
+def find_neighbour(new_arr:ArrayBuffer[VertexId]) : ArrayBuffer[VertexId] = {
+	var final_result = ArrayBuffer[VertexId]()
+	for(item <- new_arr){
+		// extract neighbours based on srcId
+		val temp = graph.edges.filter(e => e.srcId == item)
+		val temp_arr = temp.map(e=>e.dstId)
+		// Step1!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!this line does not work
+		final_result = final_result ++ temp_arr
+	}
+	return final_result
+}
+// val temp = graph.edges.filter(e => e.srcId == 1)
+
+
+// this function is used to get the hop distribution of a single node
+import scala.collection.mutable.ArrayBuffer
+
+def vertex_hop_distribution(vertex_id:Long) = {
+	var pre_arr = ArrayBuffer[VertexId]()
+	var cur_arr = ArrayBuffer[VertexId]()
+	var new_arr = ArrayBuffer[VertexId](vertex_id)
+	var loop_count = 0
+
+	while(new_arr.length != 0){
+		println("cur loop: "+loop_count)
+		println("cur new: "+new_arr.mkString(","))
+		loop_count = loop_count + 1
+		pre_arr = cur_arr
+		cur_arr = new_arr
+		new_arr = find_neighbour(new_arr)
+		// Step2 see if the results right with sample graph a, b, c, d
+	}
+
+}
+
 System.exit(0)
