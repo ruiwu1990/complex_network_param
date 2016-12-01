@@ -16,7 +16,7 @@ import scala.collection.mutable.ArrayBuffer
 // 	return 0	
 // }
 
-val filename = "test.net"
+val filename = "test1.net"
 
 var temp_vertex = Array[String]()
 var temp_edge = Array[String]()
@@ -122,18 +122,32 @@ def vertex_hop_distribution(vertex_id:Long) = {
 	var pre_arr = ArrayBuffer[Long]()
 	var cur_arr = ArrayBuffer[Long]()
 	var new_arr = ArrayBuffer[Long](vertex_id)
+	var result_arr = Set[Long]()
 	var loop_count = 0
+	// stop if there is no new node or there is a loop
+	while((new_arr.length!=0) && (pre_arr.toSet!=(pre_arr++new_arr).toSet)){
+		// union two arraybuffer
+		cur_arr.foreach(i=>
+			if((pre_arr contains i)==false)
+				pre_arr += i
+		)
 
-	while(new_arr.length != 0){
-		println("cur loop: "+loop_count)
-		println("cur new: "+new_arr.mkString(","))
-		loop_count = loop_count + 1
-		pre_arr = cur_arr
 		cur_arr = new_arr
 		new_arr = find_neighbour(new_arr)
+
+		result_arr = pre_arr.toSet.union(cur_arr.toSet)
+		println("cur loop: "+loop_count)
+		println("cur status: "+result_arr.mkString(","))
+		loop_count = loop_count + 1
+
 		// Step2 put results into a file
 	}
 
 }
 
-System.exit(0)
+val temp_vertices_arr = graph.vertices.collect()
+// foreach will run by parallel by referring to this link:
+// http://stackoverflow.com/questions/38069239/parallelize-avoid-foreach-loop-in-spark
+temp_vertices_arr.foreach(i => vertex_hop_distribution(i._1.toLong))
+
+// System.exit(0)
