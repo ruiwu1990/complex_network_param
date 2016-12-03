@@ -83,19 +83,40 @@ var temp_degree_pair = degrees.map(line => (line._2,1))
 val result_degree = temp_degree_pair.groupByKey()
 val final_result_degree = result_degree.map(line => (line._1,line._2.sum))
 
-/*
+// get the closeness centrality
 import org.apache.spark.graphx._
 import org.apache.spark.graphx.lib.ShortestPaths
 
-val result = ShortestPaths.run(graph, Seq(160))
-val shortestPath = result               // result is a graph
-  .vertices                             // we get the vertices RDD
-  .filter({case(vId, _) => vId == 1})  // we filter to get only the shortest path from v1
-  .first                                // there's only one value
-  ._2                                   // the result is a tuple (v1, Map)
-  .get(160)  
-*/
-// val shortestPath = result.vertices.filter({case(vId, _) => vId == 160}).first._2.get(1)
+val vertex_num = graph.vertices.collect().length
+
+def closeness_centrality(start:Int,vertex_num:Int) : Float = {
+	
+	var temp_sum = 0f
+	for(count <- 1 to vertex_num ){
+		// from start to count
+		// if count == start then shortest path is 0
+		val result = ShortestPaths.run(graph, Seq(count))
+		if(result.vertices.filter({case(vId, _) => vId == start}).first._2.get(count)!=None){
+			temp_sum = temp_sum + result.vertices.filter({case(vId, _) => vId == start}).first._2.get(count).get.toFloat
+		}
+	}
+	return ((vertex_num.toFloat-1)/temp_sum)
+
+}
+
+closeness_centrality(1,vertex_num)
+
+// shortest path from 1 to 4
+// val result = ShortestPaths.run(graph, Seq(4))
+// val shortestPath = result.vertices.filter({case(vId, _) => vId == 1}).first._2.get(4)
+// val shortestPath = result               // result is a graph
+//   .vertices                             // we get the vertices RDD
+//   .filter({case(vId, _) => vId == 1})  // we filter to get only the shortest path from v1
+//   .first                                // there's only one value
+//   ._2                                   // the result is a tuple (v1, Map)
+//   .get(160)  
+
+
 
 import scala.collection.mutable.ArrayBuffer
 // this code find all the neighbours of the vertex
@@ -118,7 +139,7 @@ def find_neighbour(new_arr:ArrayBuffer[Long]) : ArrayBuffer[Long] = {
 // this function is used to get the hop distribution of a single node
 import scala.collection.mutable.ArrayBuffer
 
-def vertex_hop_distribution(vertex_id:Long) = {
+def vertex_hop_distribution(vertex_id:Long,result_matrix:Array[Array[Long]]) = {
 	var pre_arr = ArrayBuffer[Long]()
 	var cur_arr = ArrayBuffer[Long]()
 	var new_arr = ArrayBuffer[Long](vertex_id)
@@ -134,10 +155,12 @@ def vertex_hop_distribution(vertex_id:Long) = {
 
 		cur_arr = new_arr
 		new_arr = find_neighbour(new_arr)
-
+		// this record the vertices IDs
 		result_arr = pre_arr.toSet.union(cur_arr.toSet)
-		println("cur loop: "+loop_count)
-		println("cur status: "+result_arr.mkString(","))
+		// ID starts from 1, array boundary starts from 1, so -1
+		result_matrix(vertex_id.toInt-1)(loop_count) = result_arr.toArray.length
+		// println("cur loop: "+loop_count)
+		// println("cur status: "+result_arr.mkString(","))
 		loop_count = loop_count + 1
 
 		// Step2 put results into a file
@@ -145,9 +168,35 @@ def vertex_hop_distribution(vertex_id:Long) = {
 
 }
 
+// this function get final normalized hop distribution
+def normalized_hop_distribution(result_matrix:Array[Array[Long]],normalized_result:Array[Float],element_num:Int) = {
+	for(r <- 0 to (element_num-1)){
+		for(c <- 0 to (element_num-1)){
+			normalized_result(c) = normalized_result(c) + (result_matrix(r)(c).toFloat/element_num.toFloat)
+		}
+	}
+	for(c <- 0 to (element_num-1)){
+		normalized_result(c) = normalized_result(c)/element_num.toFloat
+	}
+}
+
+val vertex_num = graph.vertices.collect().length
+// the maximum hop should be vertex_num - 1
+// create 2D matrix to record the results, avoid writing conflicts
+// var hop_distribution_matrix = Array.ofDim[ArrayBuffer[Long]](vertex_num,vertex_num-1)
+var hop_distribution_matrix = Array.ofDim[Long](vertex_num,vertex_num)
 val temp_vertices_arr = graph.vertices.collect()
+
+// start time 
+val t_start = System.currentTimeMillis
+
 // foreach will run by parallel by referring to this link:
 // http://stackoverflow.com/questions/38069239/parallelize-avoid-foreach-loop-in-spark
-temp_vertices_arr.foreach(i => vertex_hop_distribution(i._1.toLong))
+temp_vertices_arr.foreach(i => vertex_hop_distribution(i._1.toLong,hop_distribution_matrix))
 
+var normalized_result = Array.ofDim[Float](vertex_num)
+normalized_hop_distribution(hop_distribution_matrix,normalized_result,vertex_num)
+
+val t_end = System.currentTimeMillis
+println("total time:"+(t_end-t_start))
 // System.exit(0)
