@@ -9,6 +9,7 @@ import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
 import scala.io.Source
 import scala.collection.mutable.ArrayBuffer
+import java.io._
 
 // // it will change the array
 // def test(input_arr:Array[Int]) : Int = {
@@ -16,7 +17,8 @@ import scala.collection.mutable.ArrayBuffer
 // 	return 0	
 // }
 
-val filename = "static/data/simple.net"
+// val filename = "static/data/simple.net"
+val filename = "static/data/nexusanon.net"
 
 var temp_vertex = Array[String]()
 var temp_edge = Array[String]()
@@ -104,7 +106,7 @@ def closeness_centrality(start:Int,vertex_num:Int) : Float = {
 
 }
 
-// closeness_centrality(1,vertex_num)
+val closeness_cen = closeness_centrality(1,vertex_num)
 
 // shortest path from 1 to 4
 // val result = ShortestPaths.run(graph, Seq(4))
@@ -199,4 +201,13 @@ normalized_hop_distribution(hop_distribution_matrix,normalized_result,vertex_num
 
 val t_end = System.currentTimeMillis
 println("total time:"+(t_end-t_start))
-System.exit(0)
+
+val pw = new PrintWriter(new File("result.txt"))
+val final_arr = final_result_degree.collect
+final_arr.foreach(i=>pw.write(i._1.toString()+","+i._2.toString()+"&&"))
+pw.write("\n")
+pw.write(closeness_cen.toString())
+pw.write("\n")
+
+pw.close
+// System.exit(0)
