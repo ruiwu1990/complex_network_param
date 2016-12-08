@@ -16,7 +16,7 @@ import scala.collection.mutable.ArrayBuffer
 // 	return 0	
 // }
 
-val filename = "test1.net"
+val filename = "static/data/simple.net"
 
 var temp_vertex = Array[String]()
 var temp_edge = Array[String]()
@@ -199,4 +199,4 @@ normalized_hop_distribution(hop_distribution_matrix,normalized_result,vertex_num
 
 val t_end = System.currentTimeMillis
 println("total time:"+(t_end-t_start))
-// System.exit(0)
+System.exit(0)

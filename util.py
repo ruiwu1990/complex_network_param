@@ -5,7 +5,7 @@ import json
 
 app_path = os.path.dirname(os.path.abspath(__file__))
 
-def exec_apache_spark_scala(filename):
+def exec_apache_spark_scala():
 	'''
 	this function run scala script
 	'''
