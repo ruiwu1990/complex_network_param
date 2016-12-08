@@ -104,7 +104,7 @@ def closeness_centrality(start:Int,vertex_num:Int) : Float = {
 
 }
 
-closeness_centrality(1,vertex_num)
+// closeness_centrality(1,vertex_num)
 
 // shortest path from 1 to 4
 // val result = ShortestPaths.run(graph, Seq(4))
