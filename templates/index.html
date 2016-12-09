@@ -2,6 +2,17 @@
 
 {% block title %}Index{% endblock %}
 
+{% block extrajs %}
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript" src="/static/js/vis_result.js"></script>
+{% endblock %}
+
 {% block content %}
 <p>Here are the results.</p>
+<p id='closeness_centrality'></p>
+
+<p id='degree_distribution'></p>
+
+<p id='hop_distribution'></p>
+
 {% endblock %}

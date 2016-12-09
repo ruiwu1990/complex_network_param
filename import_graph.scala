@@ -17,8 +17,8 @@ import java.io._
 // 	return 0	
 // }
 
-// val filename = "static/data/simple.net"
-val filename = "static/data/nexusanon.net"
+val filename = "static/data/simple.net"
+// val filename = "static/data/nexusanon.net"
 
 var temp_vertex = Array[String]()
 var temp_edge = Array[String]()
@@ -208,6 +208,6 @@ final_arr.foreach(i=>pw.write(i._1.toString()+","+i._2.toString()+"&&"))
 pw.write("\n")
 pw.write(closeness_cen.toString())
 pw.write("\n")
-
+pw.write(normalized_result.mkString(","))
 pw.close
 // System.exit(0)

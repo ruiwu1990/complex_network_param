@@ -10,6 +10,11 @@ def index():
 	util.exec_apache_spark_scala()
 	return render_template('index.html')
 
+@app.route('/api/get_result')
+def get_result_data():
+	filename = 'result.txt'
+	return parse_result_file(filename)
+
 if __name__ == '__main__':
     app.debug = True
     app.run(host='0.0.0.0')
