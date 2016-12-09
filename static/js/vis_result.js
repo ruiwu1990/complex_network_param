@@ -5,7 +5,7 @@ $(document).ready(function(){
 		var chosen_closeness_cen = inputJson['chosen_closeness_cen'];
 		var hop_distribution = inputJson['hop_distribution'];
 
-		$('#closeness_centrality').text('closeness centrality of the chosen vertex is: '+closeness.toString());
+		$('#closeness_centrality').text('closeness centrality of the chosen vertex is: '+chosen_closeness_cen.toString());
 
 		google.charts.load('current', {'packages':['corechart']});
 	    google.charts.setOnLoadCallback(drawChart);
@@ -39,8 +39,8 @@ $(document).ready(function(){
         var chart1 = new google.visualization.LineChart(document.getElementById('degree_distribution'));
         var chart2 = new google.visualization.LineChart(document.getElementById('hop_distribution'));
 
-        chart1.draw(google.visualization.arrayToDataTable(degree_dist_arr), options);
-        chart2.draw(data, options);
+        chart1.draw(google.visualization.arrayToDataTable(degree_dist_arr), options1);
+        chart2.draw(google.visualization.arrayToDataTable(hop_dist_arr), options2);
       }
 
 

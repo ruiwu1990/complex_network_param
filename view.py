@@ -13,7 +13,7 @@ def index():
 @app.route('/api/get_result')
 def get_result_data():
 	filename = 'result.txt'
-	return parse_result_file(filename)
+	return util.parse_result_file(filename)
 
 if __name__ == '__main__':
     app.debug = True

@@ -210,4 +210,4 @@ pw.write(closeness_cen.toString())
 pw.write("\n")
 pw.write(normalized_result.mkString(","))
 pw.close
-// System.exit(0)
+System.exit(0)
