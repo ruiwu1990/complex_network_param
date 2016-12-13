@@ -183,7 +183,7 @@ def normalized_hop_distribution(result_matrix:Array[Array[Long]],normalized_resu
 	}
 	// fill the rest zero with the previous elements
 	// without this the array can be something like this (0.2,0.24,0,0
-	var pre = 0.0
+	var pre = 0.0f
 	for(c <- 0 to (element_num-1)){
 		if(normalized_result(c).toFloat == 0.0){
 			normalized_result(c) = pre
