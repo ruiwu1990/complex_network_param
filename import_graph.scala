@@ -171,6 +171,7 @@ def vertex_hop_distribution(vertex_id:Long,result_matrix:Array[Array[Long]]) = {
 
 }
 
+
 // this function get final normalized hop distribution
 def normalized_hop_distribution(result_matrix:Array[Array[Long]],normalized_result:Array[Float],element_num:Int) = {
 	for(r <- 0 to (element_num-1)){
@@ -181,21 +182,36 @@ def normalized_hop_distribution(result_matrix:Array[Array[Long]],normalized_resu
 	for(c <- 0 to (element_num-1)){
 		normalized_result(c) = normalized_result(c)/element_num.toFloat
 	}
-	// fill the rest zero with the previous elements
-	// without this the array can be something like this (0.2,0.24,0,0
-	// en.. there is a bug here...
-	var pre = 0.0f
-	for(c <- 0 to (element_num-1)){
-		if(normalized_result(c).toFloat == 0.0){
-			normalized_result(c) = pre
+	// // fill the rest zero with the previous elements
+	// // without this the array can be something like this (0.2,0.24,0,0
+	// // en.. there is a bug here...
+	// var pre = 0.0f
+	// for(c <- 0 to (element_num-1)){
+	// 	if(normalized_result(c).toFloat == 0.0){
+	// 		normalized_result(c) = pre
+	// 	}
+	// 	else if(pre < normalized_result(c)){
+	// 		pre = normalized_result(c)
+	// 	}
+	// 	else if(pre > normalized_result(c)){
+	// 		normalized_result(c) = pre
+	// 	}
+	// }
+}
+
+def fill_matrix(result_matrix:Array[Long]) = {
+	// this function fill the left 0 with the last element_num
+	// Array(1,2,3,7,0,0)=>Array(1,2,3,7,7,7)
+	var pre : Long = result_matrix(0);
+	for(item <- 1 to (result_matrix.length-1)){
+		if(result_matrix(item) == 0){
+			result_matrix(item) = pre
 		}
-		else if(pre < normalized_result(c)){
-			pre = normalized_result(c)
-		}
-		else if(pre > normalized_result(c)){
-			normalized_result(c) = pre
+		else{
+			pre = result_matrix(item)	
 		}
 	}
+
 }
 
 val vertex_num = graph.vertices.collect().length
@@ -211,6 +227,8 @@ val t_start = System.currentTimeMillis
 // foreach will run by parallel by referring to this link:
 // http://stackoverflow.com/questions/38069239/parallelize-avoid-foreach-loop-in-spark
 temp_vertices_arr.foreach(i => vertex_hop_distribution(i._1.toLong,hop_distribution_matrix))
+// replace zero with precious item
+hop_distribution_matrix.foreach(i=>fill_matrix(i))
 
 var normalized_result = Array.ofDim[Float](vertex_num)
 normalized_hop_distribution(hop_distribution_matrix,normalized_result,vertex_num)
