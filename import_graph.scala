@@ -188,7 +188,7 @@ def normalized_hop_distribution(result_matrix:Array[Array[Long]],normalized_resu
 		if(normalized_result(c).toFloat == 0.0){
 			normalized_result(c) = pre
 		}
-		else{
+		else if(pre < normalized_result(c)){
 			pre = normalized_result(c)
 		}
 	}

@@ -19,6 +19,7 @@ $(document).ready(function(){
 	    	degree_dist_arr.push([parseInt(temp[0]),parseInt(temp[1])]);
 	    }
 
+
         var options1 = {
           title: 'Degree distribution',
           curveType: 'function',
@@ -36,8 +37,8 @@ $(document).ready(function(){
           legend: { position: 'bottom' }
         };
 
-        var chart1 = new google.visualization.LineChart(document.getElementById('degree_distribution'));
-        var chart2 = new google.visualization.LineChart(document.getElementById('hop_distribution'));
+        var chart1 = new google.visualization.ScatterChart(document.getElementById('degree_distribution'));
+        var chart2 = new google.visualization.ScatterChart(document.getElementById('hop_distribution'));
 
         chart1.draw(google.visualization.arrayToDataTable(degree_dist_arr), options1);
         chart2.draw(google.visualization.arrayToDataTable(hop_dist_arr), options2);
