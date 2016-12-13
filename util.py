@@ -2,6 +2,9 @@ import subprocess
 import sys
 import os
 import json
+import networkx as nx
+from networkx.utils import (powerlaw_sequence, create_degree_sequence)
+from networkx.readwrite import json_graph
 
 app_path = os.path.dirname(os.path.abspath(__file__))
 
@@ -46,3 +49,29 @@ def parse_result_file(filename):
 				 'hop_distribution':hop_distribution_arr}
 
 	return json.dumps(dict_info)
+
+def generate_scale_free_power_law_graph(num,exp,seed):
+	'''
+	this function generates a scale free with power law
+	graph and write it into a file with .net format
+	'''
+	sequence = create_degree_sequence(num, powerlaw_sequence, exponent=exp)
+	graph = nx.configuration_model(sequence, seed=seed)
+	loops = graph.selfloop_edges()
+	json_str = json_graph.dumps(graph)
+	dict_graph = json.loads(json_str)
+	output_file = open('scale_free_power_law.net','w')
+	# write nodes
+	total_node_num = len(dict_graph['nodes'])
+	output_file.write('*Vertices '+str(total_node_num)+'\n')
+	count = 1
+	for item in dict_graph['nodes']:
+		# +1 coz id starts with 0, it should start from 1
+		output_file.write('  '+str(count)+'  '+str(item['id']+1)+'\n')
+		count = count + 1
+	# write edges, links
+	output_file.write('*Edges'+'\n')
+	for item in dict_graph['links']:
+		# +1 coz source and target starts with 0, it should start from 1
+		output_file.write(str(item['source']+1)+' '+str(item['target']+1)+' 1'+'\n')
+	output_file.close()

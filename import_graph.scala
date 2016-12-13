@@ -17,7 +17,8 @@ import java.io._
 // 	return 0	
 // }
 
-val filename = "static/data/simple.net"
+val filename = "static/data/scale_free_power_law.net"
+// val filename = "static/data/simple.net"
 // val filename = "static/data/nexusanon.net"
 
 var temp_vertex = Array[String]()
@@ -179,6 +180,17 @@ def normalized_hop_distribution(result_matrix:Array[Array[Long]],normalized_resu
 	}
 	for(c <- 0 to (element_num-1)){
 		normalized_result(c) = normalized_result(c)/element_num.toFloat
+	}
+	// fill the rest zero with the previous elements
+	// without this the array can be something like this (0.2,0.24,0,0
+	var pre = 0.0
+	for(c <- 0 to (element_num-1)){
+		if(normalized_result(c).toFloat == 0.0){
+			normalized_result(c) = pre
+		}
+		else{
+			pre = normalized_result(c)
+		}
 	}
 }
 
